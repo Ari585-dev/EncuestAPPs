@@ -3,12 +3,21 @@ import connection from "../config/database.js";
 export const EncuestaModel = {
   crear: (data, callback) => {
     const sql = `
-      INSERT INTO encuesta (titulo, descripcion, fechaInicio, fechaFin, idEmpresa)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO encuesta (titulo, descripcion, fechaInicio, fechaFin, idEmpresa, canal, Cant_Preguntas, estado)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
     connection.query(
       sql,
-      [data.titulo, data.descripcion, data.fechaInicio, data.fechaFin, data.idEmpresa],
+      [
+        data.titulo,
+        data.descripcion,
+        data.fechaInicio,
+        data.fechaFin,
+        data.idEmpresa,
+        data.canal,
+        data.Cant_Preguntas,
+        data.estado
+      ],
       callback
     );
   },
