@@ -1,39 +1,28 @@
-import { Encuesta } from "../models/Encuesta.js";
-import { Pregunta } from "../models/Pregunta.js";
-import { OpcionRespuesta } from "../models/OpcionRespuesta.js";
+import { EncuestaModel } from "../models/Encuesta.js";
 
-export const crearEncuesta = async (req, res) => {
-  try {
-    const { empresaId, titulo, descripcion, preguntas } = req.body;
-
-    const encuesta = await Encuesta.create({
-      EmpresaIdEmpresa: empresaId,
-      titulo,
-      descripcion,
-      estado: "Activa"
+export const EncuestaController = {
+  crear: (req, res) => {
+    EncuestaModel.crear(req.body, (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Encuesta creada", id: result.insertId });
     });
+  },
 
-    for (const p of preguntas) {
-      const pregunta = await Pregunta.create({
-        texto: p.texto,
-        tipo: p.tipo,
-        orden: p.orden,
-        EncuestumIdEncuesta: encuesta.idEncuesta
-      });
+  listarPorEmpresa: (req, res) => {
+    const { idEmpresa } = req.params;
 
-      if (p.opciones) {
-        for (const o of p.opciones) {
-          await OpcionRespuesta.create({
-            texto: o.texto,
-            valor: o.valor,
-            PreguntumIdPregunta: pregunta.idPregunta
-          });
-        }
-      }
-    }
+    EncuestaModel.listarPorEmpresa(idEmpresa, (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    });
+  },
 
-    res.json({ message: "Encuesta creada", encuesta });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  obtenerResultados: (req, res) => {
+    const { idEncuesta } = req.params;
+
+    EncuestaModel.obtenerResultados(idEncuesta, (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    });
   }
 };

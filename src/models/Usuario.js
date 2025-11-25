@@ -1,16 +1,32 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { Empresa } from "./Empresa.js";
+import connection from "../config/database.js";
 
-export const Usuario = sequelize.define("Usuario", {
-  idUsuario: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  nombre: DataTypes.STRING,
-  email: DataTypes.STRING,
-  perfil: DataTypes.ENUM("supAdmin", "Creador", "Analista"),
-  rol: DataTypes.ENUM("supAdmin", "Creador", "Analista"),
-  estado: DataTypes.ENUM("Activo", "Inactivo"),
-  contraseña: DataTypes.STRING
-});
+export const UsuarioModel = {
+  create: (data, callback) => {
+    const query = `
+      INSERT INTO usuario (nombre, apellidos, email, perfil, estado, passwd, idEmpresa)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
 
-Empresa.hasMany(Usuario);
-Usuario.belongsTo(Empresa);
+    connection.query(
+      query,
+      [
+        data.nombre,
+        data.apellidos,
+        data.email,
+        data.perfil,
+        data.estado,
+        data.passwd,   // ← AQUÍ estaba el error
+        data.idEmpresa
+      ],
+      callback
+    );
+  },
+
+  login: (email, passwd, callback) => {
+    connection.query(
+      `SELECT nombre, apellidos, email, perfil, estado FROM usuario WHERE email = ? AND passwd = ? AND estado = 'Activo'`,
+      [email, passwd],
+      callback
+    );
+  }
+};

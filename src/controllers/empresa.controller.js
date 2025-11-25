@@ -1,27 +1,17 @@
-import { Empresa } from "../models/Empresa.js";
-import { Usuario } from "../models/Usuario.js";
-import bcrypt from "bcrypt";
+import { EmpresaModel } from "../models/Empresa.js";
 
-export const crearEmpresa = async (req, res) => {
-  try {
-    const { nombre, nit, direccion, telefono, usuarioAdmin } = req.body;
-
-    const empresa = await Empresa.create({ nombre, nit, direccion, telefono });
-
-    const hash = await bcrypt.hash(usuarioAdmin.contraseña, 10);
-
-    await Usuario.create({
-      nombre: usuarioAdmin.nombre,
-      email: usuarioAdmin.email,
-      contraseña: hash,
-      perfil: "supAdmin",
-      rol: "supAdmin",
-      estado: "Activo",
-      EmpresaIdEmpresa: empresa.idEmpresa
+export const EmpresaController = {
+  crearEmpresa: (req, res) => {
+    EmpresaModel.create(req.body, (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Empresa registrada", id: result.insertId });
     });
+  },
 
-    res.json({ message: "Empresa creada", empresa });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  listarEmpresas: (req, res) => {
+    EmpresaModel.findAll((err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    });
   }
 };

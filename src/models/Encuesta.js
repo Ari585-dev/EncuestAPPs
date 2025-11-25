@@ -1,19 +1,38 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { Empresa } from "./Empresa.js";
+import connection from "../config/database.js";
 
-export const Encuesta = sequelize.define("Encuesta", {
-  idEncuesta: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  titulo: DataTypes.STRING,
-  descripcion: DataTypes.STRING,
-  fechaInicio: DataTypes.DATE,
-  fechaFin: DataTypes.DATE,
-  enlaceLargo: DataTypes.STRING,
-  enlaceCorto: DataTypes.STRING,
-  qrCode: DataTypes.STRING,
-  estado: DataTypes.ENUM("Activa", "Inactiva"),
-  canal: DataTypes.ENUM("Web", "WhatsApp")
-});
+export const EncuestaModel = {
+  crear: (data, callback) => {
+    const sql = `
+      INSERT INTO encuesta (titulo, descripcion, fechaInicio, fechaFin, idEmpresa)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    connection.query(
+      sql,
+      [data.titulo, data.descripcion, data.fechaInicio, data.fechaFin, data.idEmpresa],
+      callback
+    );
+  },
 
-Empresa.hasMany(Encuesta);
-Encuesta.belongsTo(Empresa);
+  listarPorEmpresa: (idEmpresa, callback) => {
+    connection.query(
+      "SELECT * FROM encuesta WHERE idEmpresa = ?",
+      [idEmpresa],
+      callback
+    );
+  },
+
+  obtenerResultados: (idEncuesta, callback) => {
+    connection.query(
+      `
+        SELECT p.texto AS pregunta, rp.respuestaTexto, o.texto AS opcion
+        FROM respuesta_encuesta re
+        JOIN respuesta_pregunta rp ON rp.idRespuesta = re.idRespuesta
+        JOIN pregunta p ON p.idPregunta = rp.idPregunta
+        LEFT JOIN opcionrespuesta o ON o.idOpcion = rp.opcionSeleccionada
+        WHERE re.idEncuesta = ?
+      `,
+      [idEncuesta],
+      callback
+    );
+  }
+};

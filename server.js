@@ -1,7 +1,17 @@
-import app from "./app.js";
-import { sequelize } from "./src/config/database.js";
+import express from "express";
+import cors from "cors";
+import empresaRoutes from "./src/routes/empresa.routes.js";
+import usuarioRoutes from "./src/routes/usuario.routes.js";
+import encuestaRoutes from "./src/routes/encuesta.routes.js";
 
-await sequelize.sync({ alter: true });
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Servidor en puerto " + PORT));
+app.use("/api", empresaRoutes);
+app.use("/api", usuarioRoutes);
+app.use("/api", encuestaRoutes);
+
+app.listen(3000, () =>
+  console.log("🚀 Server running on http://localhost:3000")
+);
