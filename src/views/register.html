@@ -159,9 +159,9 @@
                 <label for="role">Role</label>
                 <select id="role" required>
                     <option value="">Select role</option>
-                    <option value="SupAdmin">SupAdmin</option>
-                    <option value="Creador">Creador</option>
-                    <option value="Analista">Analista</option>
+                    <option value="admin">Administrator</option>
+                    <option value="user">Standard User</option>
+                    <option value="guest">Guest</option>
                 </select>
             </div>
 
@@ -192,18 +192,17 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
         return;
     }
 
-    // OBTENER CAMPOS CORRECTOS
     const formData = {
-        empresaNombre: document.getElementById("companyName").value,
-        nombre: document.querySelectorAll("#fullName")[0].value,
-        apellidos: document.querySelectorAll("#fullName")[1].value,
+        nombre: document.getElementById("nombre").value,
+        apellidos: document.getElementById("apellidos").value,
         email: document.getElementById("userEmail").value,
         perfil: document.getElementById("role").value,
-        passwd: password
+        passwd: password,
+        empresaNombre: document.getElementById("empresaNombre").value
     };
 
     try {
-        const res = await fetch("http://localhost:3000/api/usuario/registro", {
+        const res = await fetch("http://localhost:3000/api/usuario/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData)
@@ -215,7 +214,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
             alert("Usuario registrado con éxito");
             window.location.href = "/login";
         } else {
-            alert("Error: " + data.error);
+            alert("Error: " + data.message);
         }
     } catch (err) {
         alert("Error de conexión con el servidor.");
@@ -223,6 +222,8 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     }
 });
 </script>
+
+
 
 </body>
 </html>

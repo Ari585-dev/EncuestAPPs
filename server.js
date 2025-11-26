@@ -28,6 +28,17 @@ app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "src/views/dashboard.html"));
 });
 
+app.get("/surveys", (req, res) => {
+  res.sendFile(path.join(__dirname, "src/views/surveys.html"));
+});
+
+app.get("/reports", (req, res) => {
+  res.sendFile(path.join(__dirname, "src/views/reports.html"));
+});
+
+app.get("/surveys/builder", (req, res) => {
+  res.sendFile(path.join(__dirname, "src/views/survey-builder.html"));
+});
 
 app.listen(3000, () =>
   console.log("🚀 Server running on http://localhost:3000")

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EncuestAPPs - Dashboard</title>
+    <title>EncuestAPPs - Surveys</title>
 
     <style>
         body {
@@ -20,9 +20,6 @@
             color: white;
             height: 100vh;
             padding: 20px 0;
-            position: fixed;
-            left: 0;
-            top: 0;
         }
 
         .sidebar h2 {
@@ -44,8 +41,6 @@
         .main {
             flex: 1;
             padding: 20px 40px;
-            margin-left: 220px;
-            width: calc(100% - 220px);
         }
 
         .top-bar {
@@ -90,59 +85,52 @@
             font-weight: bold;
         }
 
-        /* CARDS */
-        .cards-container {
-            display: flex;
-            gap: 20px;
-        }
-
-        .card-small {
+        .card {
             background: white;
             padding: 20px;
             border-radius: 12px;
-            flex: 1;
-            text-align: center;
+            margin-top: 15px;
         }
 
-        /* RECENT SURVEYS */
-        .recent-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 20px;
+        .survey-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            background: #eaf8ed;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin-bottom: 10px;
         }
 
         .survey-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 5px;
-            border-bottom: 1px solid #eee;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
         }
 
-        .status {
+        .badge {
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 12px;
             color: white;
         }
-
-        .active-status { background: #28a745; }
-        .closed-status { background: #6c757d; }
-        .draft-status { background: #ffc107; color: black; }
+        .active { background: #28a745; }
+        .closed { background: #6c757d; }
+        .draft { background: #ffc107; }
     </style>
 </head>
-
 <body>
 
     <!-- SIDEBAR -->
     <div class="sidebar">
         <h2>EncuestAPPs</h2>
 
-        <div class="menu-item active" onclick="location.href='http://localhost:3000/dashboard'">
+        <div class="menu-item" onclick="location.href='http://localhost:3000/dashboard'">
             Dashboard
         </div>
 
-        <div class="menu-item" onclick="location.href='http://localhost:3000/surveys'">
+        <div class="menu-item active" onclick="location.href='http://localhost:3000/surveys'">
             Surveys
         </div>
 
@@ -153,10 +141,10 @@
         <div class="menu-item">Company Settings</div>
     </div>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
     <div class="main">
 
-        <!-- TOP BAR -->
+        <!-- TOP RIGHT USER INFO -->
         <div class="top-bar">
             <div class="user-box">
                 <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" width="28">
@@ -167,51 +155,24 @@
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
 
-        <h1>Dashboard</h1>
+        <!-- NEW SURVEY BUTTON -->
+        <button class="newSurveyBtn" onclick="location.href='http://localhost:3000/surveys/builder'">
+            + New Survey
+        </button>
 
-        <!-- CARDS -->
-        <div class="cards-container">
-            <div class="card-small">
-                <h2>24</h2>
-                <p>Total Surveys</p>
-            </div>
-            <div class="card-small">
-                <h2>156</h2>
-                <p>Responses Today</p>
-            </div>
-            <div class="card-small">
-                <h2>3</h2>
-                <p>Pending to Close</p>
-            </div>
-            <div class="card-small">
-                <h2>87%</h2>
-                <p>Completion Rate</p>
-            </div>
-        </div>
+        <!-- CONTENT -->
+        <h1>Surveys</h1>
 
-        <!-- RECENT SURVEYS -->
-        <div class="recent-card">
-            <h3>Recent Surveys</h3>
+        <div class="card" id="surveyContainer">
 
-            <div class="survey-row">
-                <span>Employee Satisfaction Q4 2024</span>
-                <span class="status active-status">Active</span>
+            <div class="survey-header">
+                <span>Survey Title</span>
+                <span>Status</span>
+                <span>Date Range</span>
+                <span>Responses</span>
+                <span>Actions</span>
             </div>
 
-            <div class="survey-row">
-                <span>Product Feedback Survey</span>
-                <span class="status active-status">Active</span>
-            </div>
-
-            <div class="survey-row">
-                <span>Customer Experience Review</span>
-                <span class="status closed-status">Closed</span>
-            </div>
-
-            <div class="survey-row">
-                <span>Sustainability Practices</span>
-                <span class="status active-status">Active</span>
-            </div>
         </div>
 
     </div>
@@ -231,6 +192,56 @@
         localStorage.removeItem("userData");
         window.location.href = "http://localhost:3000/login";
     }
+
+    function formatDateRange(start, end) {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    const s = new Date(start);
+    const e = new Date(end);
+
+    const startStr = `${months[s.getMonth()]} ${s.getDate()}`;
+    const endStr = `${months[e.getMonth()]} ${e.getDate()}, ${e.getFullYear()}`;
+
+    return `${startStr} - ${endStr}`;
+}
+
+
+
+    async function loadSurveys() {
+        const container = document.getElementById("surveyContainer");
+
+        try {
+            const res = await fetch(`http://localhost:3000/api/empresa/${user.idEmpresa}`);
+            const surveys = await res.json();
+
+            surveys.forEach(s => {
+
+                let badgeClass =
+                    s.estado === "Activa" ? "active" :
+                    s.estado === "Cerrada" ? "closed" :
+                    "draft";
+
+                const row = document.createElement("div");
+                row.classList.add("survey-row");
+
+                row.innerHTML = `
+                    <span>${s.titulo}</span>
+                    <span><span class="badge ${badgeClass}">${s.estado}</span></span>
+                    <span>${formatDateRange(s.fechaInicio, s.fechaFin)}</span>
+                    <span>0</span>
+                    <span>...</span>
+                `;
+
+                container.appendChild(row);
+            });
+
+        } catch (error) {
+            console.error("Error cargando encuestas:", error);
+        }
+    }
+
+    loadSurveys();
 </script>
 
 </body>

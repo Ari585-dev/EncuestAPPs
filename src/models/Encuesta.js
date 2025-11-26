@@ -24,7 +24,7 @@ export const EncuestaModel = {
 
   listarPorEmpresa: (idEmpresa, callback) => {
     connection.query(
-      "SELECT * FROM encuesta WHERE idEmpresa = ?",
+      "SELECT titulo, estado, fechaInicio, fechaFin FROM encuesta WHERE idEmpresa = ?",
       [idEmpresa],
       callback
     );

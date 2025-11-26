@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Survey - EncuestAPPs</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7fdf9;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: #0f6b33;
+            color: white;
+            height: 100vh;
+            padding: 20px 0;
+        }
+
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+        }
+
+        .menu-item:hover,
+        .active {
+            background: #0a4d25;
+        }
+
+
+        /* MAIN CONTENT */
+        .main {
+            flex: 1;
+            padding: 20px 40px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .user-box {
+            display: flex;
+            align-items: center;
+            background: #e8f5e9;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        .user-box span {
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #d9534f;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* LAYOUT */
+        .builder-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            gap: 20px;
+        }
+
+        /* QUESTION TYPES */
+        .question-types,
+        .survey-settings,
+        .question-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .question-types button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 1px solid #cfe9d6;
+            background: #f4fbf6;
+            cursor: grab;
+        }
+
+        .question-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .delete-btn {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            cursor: pointer;
+            color: red;
+            font-size: 18px;
+        }
+
+        .option-input {
+            width: 90%;
+            margin: 3px 0;
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: #f4fbf6;
+        }
+
+        .add-option-btn {
+            background: #e3f5e9;
+            padding: 6px 10px;
+            border-radius: 10px;
+            border: 1px solid #a6d3b0;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        /* Survey Settings */
+        .survey-settings input,
+        .survey-settings textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: #f4fbf6;
+        }
+
+        .save-survey {
+            width: 100%;
+            background: #0f6b33;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 15px;
+            margin-top: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>EncuestAPPs</h2>
+
+        <div class="menu-item active" onclick="location.href='http://localhost:3000/dashboard'">
+            Dashboard
+        </div>
+
+        <div class="menu-item" onclick="location.href='http://localhost:3000/surveys'">
+            Surveys
+        </div>
+
+        <div class="menu-item" onclick="location.href='http://localhost:3000/reports'">
+            Reports
+        </div>
+        <div class="menu-item">Users</div>
+        <div class="menu-item">Company Settings</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <div class="top-bar">
+            <div class="user-box">
+                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" width="28">
+                <span id="userName">User</span> |
+                <span id="userRole" style="margin-left: 5px; color:#0f6b33;"></span>
+            </div>
+
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <h1>Survey Builder</h1>
+        <p>Create your survey with drag-and-drop</p>
+
+        <div class="builder-container">
+
+            <!-- Question Types -->
+            <div class="question-types">
+                <h3>Question Types</h3>
+
+                <button onclick="addShortText()">Short text</button>
+                <button onclick="addLongText()">Long text</button>
+                <button onclick="addMultipleChoice()">Multiple choice</button>
+                <button onclick="addRating()">Rating</button>
+                <button onclick="addYesNo()">Yes/No</button>
+            </div>
+
+            <!-- Survey Questions (Dynamic) -->
+            <div id="questionsArea"></div>
+
+            <!-- Survey Settings -->
+            <div class="survey-settings">
+                <h3>Survey Settings</h3>
+
+                <label>Title</label>
+                <input type="text" id="surveyTitle">
+
+                <label>Description</label>
+                <textarea id="surveyDescription" rows="4"></textarea>
+
+                <label>Active Date Range</label>
+                <input type="date" id="startDate">
+                <input type="date" id="endDate">
+
+                <button class="save-survey" onclick="saveSurvey()">Save Survey</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    /* Load User */
+    const user = JSON.parse(localStorage.getItem("userData"));
+    if (!user) window.location.href = "http://localhost:3000/login";
+
+    document.getElementById("userName").textContent = user.nombre;
+    document.getElementById("userRole").textContent = user.perfil;
+
+    function logout() {
+        localStorage.removeItem("userData");
+        window.location.href = "http://localhost:3000/login";
+    }
+
+    /* ADD QUESTION FUNCTIONS */
+
+    const questionsArea = document.getElementById("questionsArea");
+
+    function addShortText() {
+        questionsArea.innerHTML += `
+            <div class="question-box">
+                <span class="delete-btn" onclick="this.parentElement.remove()">🗑</span>
+                <strong>Short text</strong>
+                <input class="option-input" placeholder="Question text">
+            </div>
+        `;
+    }
+
+    function addLongText() {
+        questionsArea.innerHTML += `
+            <div class="question-box">
+                <span class="delete-btn" onclick="this.parentElement.remove()">🗑</span>
+                <strong>Long text</strong>
+                <textarea class="option-input" placeholder="Question text"></textarea>
+            </div>
+        `;
+    }
+
+    function addMultipleChoice() {
+        questionsArea.innerHTML += `
+            <div class="question-box">
+                <span class="delete-btn" onclick="this.parentElement.remove()">🗑</span>
+                <strong>Multiple choice</strong>
+                
+                <input class="option-input" placeholder="Question text">
+
+                <div class="option-block">
+                    <input class="option-input" placeholder="Option 1">
+                    <input class="option-input" placeholder="Option 2">
+                </div>
+
+                <button class="add-option-btn" onclick="addOption(this)">+ Add Option</button>
+            </div>
+        `;
+    }
+
+    function addOption(btn) {
+        const block = btn.previousElementSibling;
+        block.innerHTML += `<input class="option-input" placeholder="New option">`;
+    }
+
+    function addRating() {
+        questionsArea.innerHTML += `
+            <div class="question-box">
+                <span class="delete-btn" onclick="this.parentElement.remove()">🗑</span>
+                <strong>Rating (1–5)</strong>
+                <input class="option-input" placeholder="Question text">
+            </div>
+        `;
+    }
+
+    function addYesNo() {
+        questionsArea.innerHTML += `
+            <div class="question-box">
+                <span class="delete-btn" onclick="this.parentElement.remove()">🗑</span>
+                <strong>Yes/No</strong>
+                <input class="option-input" placeholder="Question text">
+            </div>
+        `;
+    }
+
+async function saveSurvey() {
+    const titulo = document.getElementById("surveyTitle").value.trim();
+    const descripcion = document.getElementById("surveyDescription").value.trim();
+    const fechaInicio = document.getElementById("startDate").value;
+    const fechaFin = document.getElementById("endDate").value;
+
+    const Cant_Preguntas = document.querySelectorAll(".question-box").length;
+
+    if (!titulo || !descripcion || !fechaInicio || !fechaFin) {
+        alert("Please complete all fields.");
+        return;
+    }
+
+    const user = JSON.parse(localStorage.getItem("userData"));
+    if (!user) {
+        alert("User not logged in.");
+        return;
+    }
+
+    const data = {
+        titulo: titulo,
+        descripcion: descripcion,
+        fechaInicio: fechaInicio,
+        fechaFin: fechaFin,
+        idEmpresa: user.idEmpresa,   // 🔥 VIENE DEL LOGIN
+        canal: "web",
+        Cant_Preguntas: Cant_Preguntas,
+        estado: "Activa"
+    };
+
+    console.log("DATA A ENVIAR:", data);
+
+    try {
+        const response = await fetch("http://localhost:3000/api/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        console.log("RESPUESTA DEL BACKEND:", result);
+
+        if (result.success) {
+            alert("Survey created successfully!");
+            window.location.href = "http://localhost:3000/surveys";
+        } else {
+            alert("Survey created successfully!");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Server error.");
+    }
+}
+
+</script>
+
+</body>
+</html>

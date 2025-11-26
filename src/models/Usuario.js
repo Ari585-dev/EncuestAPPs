@@ -38,7 +38,7 @@ export const UsuarioModel = {
 
   login: (email, passwd, callback) => {
     connection.query(
-      `SELECT nombre, apellidos, email, perfil, estado 
+      `SELECT nombre, apellidos, email, perfil, estado, idEmpresa
        FROM usuario 
        WHERE email = ? AND passwd = ? AND estado = 'Activo'`,
       [email, passwd],
