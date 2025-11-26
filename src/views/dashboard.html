@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard - EncuestAPPs</title>
+<style>
+  body { font-family: Arial, sans-serif; margin:0; background:#f6fbf8; }
+  header { height:64px; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 20px; box-shadow:0 1px 0 rgba(0,0,0,0.06); }
+  .brand { display:flex; align-items:center; gap:10px; color:#1b7a3a; font-weight:700; }
+  .userbox { display:flex; align-items:center; gap:12px; }
+  .avatar { width:36px; height:36px; border-radius:50%; background:#1b7a3a; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; }
+  .user-text { text-align:right; line-height:1; }
+  .user-text .name { font-weight:600; }
+  .logout { margin-left:12px; padding:6px 10px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer; }
+  main { padding:24px; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="https://cdn-icons-png.flaticon.com/512/1827/1827951.png" alt="" width="36" />
+      <div>EncuestAPPs</div>
+    </div>
+
+    <div class="userbox">
+      <div class="avatar" id="avatar">JD</div>
+      <div class="user-text">
+        <div id="userName" class="name">John Doe</div>
+        <div id="userRole" class="role" style="font-size:12px;color:#666">Administrator</div>
+      </div>
+      <button id="logoutBtn" class="logout">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <h1>Dashboard</h1>
+    <p>Bienvenido al panel. Aquí irán tus tarjetas y listas.</p>
+    <!-- Aquí va el resto de tu UI (cards, recent surveys...) -->
+  </main>
+
+<script>
+  // Al cargar, leemos el user desde localStorage y actualizamos UI
+  document.addEventListener("DOMContentLoaded", () => {
+    const userJson = localStorage.getItem("user");
+    if (!userJson) {
+      // Si no hay usuario, volver al login
+      window.location.href = "/login";
+      return;
+    }
+
+    let user;
+    try {
+      user = JSON.parse(userJson);
+    } catch (e) {
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+      return;
+    }
+
+    // Nombre y apellidos
+    const nombre = user.nombre || "";
+    const apellidos = user.apellidos || "";
+    document.getElementById("userName").textContent = (nombre + " " + apellidos).trim() || user.email || "Usuario";
+
+    // Mostrar rol (puedes mapear valores si usas 'user' => 'User')
+    const roleMap = { admin: "Administrator", user: "User", guest: "Guest", Creador: "Creador", Analista: "Analista", SupAdmin: "SupAdmin" };
+    document.getElementById("userRole").textContent = roleMap[user.perfil] || user.perfil || "";
+
+    // Avatar iniciales
+    const initials = ( (nombre[0]||"") + (apellidos[0]||"") ).toUpperCase() || (user.email ? user.email[0].toUpperCase() : "U");
+    document.getElementById("avatar").textContent = initials;
+  });
+
+  // Logout
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  });
+</script>
+
+</body>
+</html>

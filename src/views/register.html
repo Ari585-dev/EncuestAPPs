@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EncuestAPPs - Create Account</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1b7a3a;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 450px; /* Ancho ajustado para más campos */
+            max-width: 90%;
+            background: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.2em;
+        }
+        .header p {
+            margin: 5px 0 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .back-link {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1em;
+            color: #1b7a3a;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .back-link span {
+            margin-right: 5px;
+            font-size: 1.2em;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            margin-top: 5px;
+        }
+        /* Estilos específicos para los placeholders de la imagen */
+        .form-group input::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+        .form-group.half-width {
+            flex-basis: 50%;
+        }
+        .full-width {
+            margin-bottom: 15px;
+        }
+        .full-width input {
+            width: 100%;
+        }
+        .submit-button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 8px;
+            background: #ffc107; /* Color amarillo de la imagen */
+            color: black;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+        .submit-button:hover {
+            background: #e0b400;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+        <a class="back-link" onclick="location.href = 'http://localhost:3000/login'">
+            <span>&larr;</span> Back to Login
+        </a>
+
+        <div class="header">
+            <img src="https://cdn-icons-png.flaticon.com/512/1827/1827951.png" alt="Icono de Documento">
+            <h3>Create Account</h3>
+            <p>Join EncuestAPPs today</p>
+        </div>
+
+        <form id="registerForm">
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="companyName">Company Name</label>
+                    <input type="text" id="companyName" placeholder="Your Company Ltd." required />
+                </div>
+            </div>
+
+
+            <div class="full-width form-group">
+                <label for="fullName">User Name</label>
+                <input type="text" id="fullName" placeholder="John" required />
+            </div>
+
+                        <div class="full-width form-group">
+                <label for="fullName">User Last Name</label>
+                <input type="text" id="fullName" placeholder="Doe" required />
+            </div>
+
+            <div class="full-width form-group">
+                <label for="userEmail">User Email</label>
+                <input type="email" id="userEmail" placeholder="john.doe@company.com" required />
+            </div>
+
+            <div class="full-width form-group">
+                <label for="role">Role</label>
+                <select id="role" required>
+                    <option value="">Select role</option>
+                    <option value="SupAdmin">SupAdmin</option>
+                    <option value="Creador">Creador</option>
+                    <option value="Analista">Analista</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" value="********" required />
+                </div>
+                <div class="form-group half-width">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" value="********" required />
+                </div>
+            </div>
+
+            <button type="submit" class="submit-button">Create Account</button>
+        </form>
+    </div>
+
+<script>
+document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+        alert("Las contraseñas no coinciden.");
+        return;
+    }
+
+    // OBTENER CAMPOS CORRECTOS
+    const formData = {
+        empresaNombre: document.getElementById("companyName").value,
+        nombre: document.querySelectorAll("#fullName")[0].value,
+        apellidos: document.querySelectorAll("#fullName")[1].value,
+        email: document.getElementById("userEmail").value,
+        perfil: document.getElementById("role").value,
+        passwd: password
+    };
+
+    try {
+        const res = await fetch("http://localhost:3000/api/usuario/registro", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert("Usuario registrado con éxito");
+            window.location.href = "/login";
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        alert("Error de conexión con el servidor.");
+        console.error(err);
+    }
+});
+</script>
+
+</body>
+</html>

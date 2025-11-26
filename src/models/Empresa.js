@@ -14,5 +14,14 @@ export const EmpresaModel = {
 
   findAll: (callback) => {
     connection.query("SELECT * FROM empresa", callback);
+  },
+
+  findAll: (callback) => {
+        connection.query(
+      "SELECT * FROM empresa WHERE nombre = ?",
+      [nombre],
+      callback
+        );
   }
+  
 };

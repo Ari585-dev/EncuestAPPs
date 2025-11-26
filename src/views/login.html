@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EncuestAPPs - Login</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1b7a3a;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 380px;
+            margin: 80px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        img {
+            width: 70px;
+            margin-bottom: 15px;
+        }
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+        button {
+            width: 90%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 20px;
+            background: #1b7a3a;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .secondary {
+            background: white;
+            border: 2px solid #1b7a3a;
+            color: #1b7a3a;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+        <img src="https://cdn-icons-png.flaticon.com/512/1827/1827951.png">
+
+        <h2>EncuestAPPs</h2>
+        <p>Sustainable Survey Solutions</p>
+
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="your.email@company.com" required />
+            <input type="password" id="passwd" placeholder="Enter your password" required />
+
+            <div style="text-align: right; font-size: 12px; margin-top: -8px;">
+                <a href="#">Forgot Password?</a>
+            </div>
+
+            <button type="submit">Log In</button>
+            <button type="button" class="secondary" onclick="location.href = 'http://localhost:3000/register'">
+                Register
+            </button>
+        </form>
+    </div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const passwd = document.getElementById("passwd").value;
+
+    try {
+        const res = await fetch("http://localhost:3000/api/usuario/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, passwd })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            const msg = data.error || data.message || "Login failed";
+            alert("Error: " + msg);
+            return;
+        }
+
+        if (!data.user) {
+            alert("Respuesta inválida del servidor.");
+            return;
+        }
+
+        // Guardamos el usuario para usarlo en /dashboard
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // ⬅️ AQUI EL CAMBIO
+        window.location.href = "http://localhost:3000/dashboard";
+
+    } catch (err) {
+        console.error("Login error:", err);
+        alert("Error de conexión con el servidor.");
+    }
+});
+</script>
+
+
+
+</body>
+</html>
