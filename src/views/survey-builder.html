@@ -316,7 +316,6 @@ async function saveSurvey() {
     const fechaFin = document.getElementById("endDate").value;
 
     const Cant_Preguntas = document.querySelectorAll(".question-box").length;
-
     if (!titulo || !descripcion || !fechaInicio || !fechaFin) {
         alert("Please complete all fields.");
         return;
@@ -328,15 +327,41 @@ async function saveSurvey() {
         return;
     }
 
+    // EXTRAER TODAS LAS PREGUNTAS DEL FORMULARIO
+    const preguntasHTML = document.querySelectorAll(".question-box");
+    const preguntas = [];
+
+    preguntasHTML.forEach((box, index) => {
+
+        const tipoTexto = box.querySelector("strong").textContent.trim();
+        let tipo = "";
+
+        if (tipoTexto === "Short text") tipo = "ABIERTA";
+        else if (tipoTexto === "Long text") tipo = "ABIERTA";
+        else if (tipoTexto === "Multiple choice") tipo = "OPCION_MULTIPLE";
+        else if (tipoTexto === "Yes/No") tipo = "SI_NO";
+        else if (tipoTexto === "Rating (1–5)") tipo = "OPCION_MULTIPLE"; 
+
+        // OBTENER TEXTO DE LA PREGUNTA
+        const preguntaText = box.querySelector(".option-input").value.trim();
+
+        preguntas.push({
+            texto: preguntaText,
+            tipo: tipo,
+            orden: index + 1
+        });
+    });
+
     const data = {
-        titulo: titulo,
-        descripcion: descripcion,
-        fechaInicio: fechaInicio,
-        fechaFin: fechaFin,
-        idEmpresa: user.idEmpresa,   // 🔥 VIENE DEL LOGIN
-        canal: "web",
+        titulo,
+        descripcion,
+        fechaInicio,
+        fechaFin,
         Cant_Preguntas: Cant_Preguntas,
-        estado: "Activa"
+        idEmpresa: user.idEmpresa,
+        canal: "web",
+        estado: "Activa",
+        preguntas: preguntas 
     };
 
     console.log("DATA A ENVIAR:", data);
@@ -357,13 +382,14 @@ async function saveSurvey() {
             alert("Survey created successfully!");
             window.location.href = "http://localhost:3000/surveys";
         } else {
-            alert("Survey created successfully!");
+            alert(result.message || "Error creating survey.");
         }
     } catch (error) {
         console.error("Error:", error);
         alert("Server error.");
     }
 }
+
 
 </script>
 

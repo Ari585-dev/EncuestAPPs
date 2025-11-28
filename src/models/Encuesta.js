@@ -6,6 +6,7 @@ export const EncuestaModel = {
       INSERT INTO encuesta (titulo, descripcion, fechaInicio, fechaFin, idEmpresa, canal, Cant_Preguntas, estado)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
+
     connection.query(
       sql,
       [

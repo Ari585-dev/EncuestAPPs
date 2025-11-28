@@ -142,12 +142,12 @@
 
             <div class="full-width form-group">
                 <label for="fullName">User Name</label>
-                <input type="text" id="fullName" placeholder="John" required />
+                <input type="text" id="name" placeholder="John" required />
             </div>
 
                         <div class="full-width form-group">
                 <label for="fullName">User Last Name</label>
-                <input type="text" id="fullName" placeholder="Doe" required />
+                <input type="text" id="lastName" placeholder="Doe" required />
             </div>
 
             <div class="full-width form-group">
@@ -159,9 +159,10 @@
                 <label for="role">Role</label>
                 <select id="role" required>
                     <option value="">Select role</option>
-                    <option value="admin">Administrator</option>
-                    <option value="user">Standard User</option>
-                    <option value="guest">Guest</option>
+                    <option value="SupAdmin">Administrator</option>
+                    <option value="Usuario">Standard User</option>
+                    <option value="Creador">Creador</option>
+                    <option value="Analista">Analista</option>
                 </select>
             </div>
 
@@ -193,16 +194,16 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     }
 
     const formData = {
-        nombre: document.getElementById("nombre").value,
-        apellidos: document.getElementById("apellidos").value,
+        nombre: document.getElementById("name").value,
+        apellidos: document.getElementById("lastName").value,
         email: document.getElementById("userEmail").value,
         perfil: document.getElementById("role").value,
         passwd: password,
-        empresaNombre: document.getElementById("empresaNombre").value
+        empresaNombre: document.getElementById("companyName").value
     };
 
     try {
-        const res = await fetch("http://localhost:3000/api/usuario/register", {
+        const res = await fetch("http://localhost:3000/api/usuario/registro", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData)

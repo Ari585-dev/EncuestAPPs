@@ -156,9 +156,10 @@
         </div>
 
         <!-- NEW SURVEY BUTTON -->
-        <button class="newSurveyBtn" onclick="location.href='http://localhost:3000/surveys/builder'">
-            + New Survey
-        </button>
+            <button id="newSurveyBtn" class="newSurveyBtn"
+                onclick="location.href='http://localhost:3000/surveys/builder'">
+                + New Survey
+            </button>
 
         <!-- CONTENT -->
         <h1>Surveys</h1>
@@ -187,6 +188,12 @@
         document.getElementById("userName").textContent = user.nombre;
         document.getElementById("userRole").textContent = user.perfil;
     }
+
+    const btnNewSurvey = document.getElementById("newSurveyBtn");
+
+        if (user.perfil !== "SupAdmin" && user.perfil !== "Creador") {
+            btnNewSurvey.style.display = "none"; // ocultar botón
+        }
 
     function logout() {
         localStorage.removeItem("userData");
