@@ -12,4 +12,6 @@ router.get("/empresa/:idEmpresa", EncuestaController.listarPorEmpresa);
 // Obtener resultados de una encuesta
 router.get("/:idEncuesta/resultados", EncuestaController.obtenerResultados);
 
+router.get("/surveys/:idEncuesta", EncuestaController.listaPorEncuesta);
+
 export default router;

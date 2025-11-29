@@ -40,6 +40,10 @@ app.get("/surveys/builder", (req, res) => {
   res.sendFile(path.join(__dirname, "src/views/survey-builder.html"));
 });
 
+app.get("/surveys/:id", (req, res) => {
+    res.sendFile(path.join(__dirname, 'src/views/survey-view.html'));
+});
+
 app.listen(3000, () =>
   console.log("🚀 Server running on http://localhost:3000")
 );

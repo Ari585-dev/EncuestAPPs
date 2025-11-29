@@ -25,7 +25,7 @@ export const EncuestaModel = {
 
   listarPorEmpresa: (idEmpresa, callback) => {
     connection.query(
-      "SELECT titulo, estado, fechaInicio, fechaFin FROM encuesta WHERE idEmpresa = ?",
+      "SELECT idEncuesta, titulo, estado, fechaInicio, fechaFin FROM encuesta WHERE idEmpresa = ?",
       [idEmpresa],
       callback
     );
@@ -44,5 +44,25 @@ export const EncuestaModel = {
       [idEncuesta],
       callback
     );
-  }
+  },
+
+getEncuestaConPreguntas: (idEncuesta, callback) => {
+    const sql = `
+        SELECT 
+            e.titulo,
+            e.descripcion,
+            e.fechaInicio,
+            e.fechaFin,
+            p.texto AS pregunta,
+            p.tipo
+        FROM encuesta e
+        LEFT JOIN pregunta p ON p.idEncuesta = e.idEncuesta
+        WHERE e.idEncuesta = ?;
+    `;
+
+    connection.query(sql, [idEncuesta], callback);
+}
+
+
+
 };

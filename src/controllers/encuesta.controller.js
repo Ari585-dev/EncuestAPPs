@@ -44,7 +44,7 @@ export const EncuestaController = {
 
   listarPorEmpresa: (req, res) => {
     const { idEmpresa } = req.params;
-
+          console.log("ID recibido:", idEmpresa);
     EncuestaModel.listarPorEmpresa(idEmpresa, (err, rows) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json(rows);
@@ -58,5 +58,37 @@ export const EncuestaController = {
       if (err) return res.status(500).json({ error: err.message });
       res.json(rows);
     });
+  },
+
+  listaPorEncuesta: (req, res) => {
+    const id = req.params.idEncuesta;
+
+    EncuestaModel.getEncuestaConPreguntas(id, (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: "Error al obtener la encuesta", detalle: err });
+      }
+
+      if (!rows || rows.length === 0) {
+        return res.status(404).json({ error: "Encuesta no encontrada" });
+      }
+
+      // Tomamos los datos generales de la encuesta de la primera fila
+      const encuesta = {
+        titulo: rows[0].titulo,
+        descripcion: rows[0].descripcion,
+        fechaInicio: rows[0].fechaInicio,
+        fechaFin: rows[0].fechaFin,
+        preguntas: rows
+          .filter(r => r.pregunta) // filtramos filas sin preguntas
+          .map(r => ({
+            pregunta: r.pregunta,
+            tipo: r.tipo
+          }))
+      };
+
+      res.json(encuesta);
+    });
   }
+
+
 };

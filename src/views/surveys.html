@@ -231,14 +231,21 @@
 
                 const row = document.createElement("div");
                 row.classList.add("survey-row");
+                row.style.cursor = "pointer";
+
+                row.onclick = () => {
+                    // Redirige a la vista de preguntas
+                    window.location.href = `http://localhost:3000/api/surveys/${s.idEncuesta}`;
+                };
 
                 row.innerHTML = `
                     <span>${s.titulo}</span>
                     <span><span class="badge ${badgeClass}">${s.estado}</span></span>
                     <span>${formatDateRange(s.fechaInicio, s.fechaFin)}</span>
                     <span>0</span>
-                    <span>...</span>
+                    <span>Ver</span>
                 `;
+
 
                 container.appendChild(row);
             });

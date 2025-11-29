@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Details - EncuestAPPs</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7fdf9;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: #0f6b33;
+            color: white;
+            height: 100vh;
+            padding: 20px 0;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+        }
+
+        .menu-item:hover,
+        .active {
+            background: #0a4d25;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            flex: 1;
+            padding: 20px 40px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .user-box {
+            display: flex;
+            align-items: center;
+            background: #e8f5e9;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        .user-box span {
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #d9534f;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* SURVEY DETAILS */
+        .survey-header-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 5px solid #0f6b33;
+        }
+
+        .question-type {
+            font-size: 13px;
+            color: #0f6b33;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>EncuestAPPs</h2>
+
+        <div class="menu-item" onclick="location.href='http://localhost:3000/dashboard'">
+            Dashboard
+        </div>
+
+        <div class="menu-item active" onclick="location.href='http://localhost:3000/surveys'">
+            Surveys
+        </div>
+
+        <div class="menu-item" onclick="location.href='http://localhost:3000/reports'">
+            Reports
+        </div>
+        <div class="menu-item">Users</div>
+        <div class="menu-item">Company Settings</div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="user-box">
+                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" width="28">
+                <span id="userName">User</span> |
+                <span id="userRole" style="margin-left: 5px; color:#0f6b33;"></span>
+            </div>
+
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Survey Header -->
+        <div class="survey-header-box">
+            <h1 id="surveyTitle">Loading...</h1>
+            <p id="surveyDescription"></p>
+            <p style="color:#0f6b33; font-weight:bold" id="surveyDates"></p>
+        </div>
+
+        <!-- Questions -->
+        <div id="questionsContainer"></div>
+
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem("userData"));
+        if (!user) {
+            window.location.href = "http://localhost:3000/login";
+        } else {
+            document.getElementById("userName").textContent = user.nombre;
+            document.getElementById("userRole").textContent = user.perfil;
+        }
+
+        function logout() {
+            localStorage.removeItem("userData");
+            window.location.href = "http://localhost:3000/login";
+        }
+
+        const surveyId = window.location.pathname.split("/").pop();
+
+async function loadSurveyDetails() {
+    try {
+        const res = await fetch(`http://localhost:3000/api/surveys/${surveyId}`);
+        const data = await res.json();
+
+        if (!data) return;
+
+        document.getElementById("surveyTitle").textContent = data.titulo;
+        document.getElementById("surveyDescription").textContent = data.descripcion || "No description available.";
+        document.getElementById("surveyDates").textContent =
+            `${new Date(data.fechaInicio).toLocaleDateString()} - ${new Date(data.fechaFin).toLocaleDateString()}`;
+
+        const container = document.getElementById("questionsContainer");
+        container.innerHTML = "";
+
+        data.preguntas.forEach(q => {
+            const card = document.createElement("div");
+            card.classList.add("question-card");
+            card.innerHTML = `
+                <div class="question-type">${q.tipo}</div>
+                <h3>${q.pregunta}</h3>
+            `;
+            container.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error loading survey:", error);
+    }
+}
+
+        loadSurveyDetails();
+    </script>
+
+</body>
+</html>
