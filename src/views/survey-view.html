@@ -95,6 +95,22 @@
             margin-bottom: 10px;
             font-weight: bold;
         }
+
+        /* Submit button */
+        .submit-btn {
+            margin-top: 20px;
+            background: #0f6b33;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .submit-btn:hover {
+            background: #0a4d25;
+        }
     </style>
 </head>
 
@@ -143,6 +159,9 @@
         <!-- Questions -->
         <div id="questionsContainer"></div>
 
+        <!-- Submit Button -->
+        <button class="submit-btn" onclick="enviarRespuestas()">Enviar respuestas</button>
+
     </div>
 
     <script>
@@ -161,37 +180,137 @@
 
         const surveyId = window.location.pathname.split("/").pop();
 
-async function loadSurveyDetails() {
-    try {
-        const res = await fetch(`http://localhost:3000/api/surveys/${surveyId}`);
-        const data = await res.json();
+        /* ============================================================
+           Cargar encuesta
+        ============================================================ */
+        async function loadSurveyDetails() {
+            try {
+                const res = await fetch(`http://localhost:3000/api/surveys/${surveyId}`);
+                const data = await res.json();
 
-        if (!data) return;
+                if (!data) return;
 
-        document.getElementById("surveyTitle").textContent = data.titulo;
-        document.getElementById("surveyDescription").textContent = data.descripcion || "No description available.";
-        document.getElementById("surveyDates").textContent =
-            `${new Date(data.fechaInicio).toLocaleDateString()} - ${new Date(data.fechaFin).toLocaleDateString()}`;
+                document.getElementById("surveyTitle").textContent = data.titulo;
+                document.getElementById("surveyDescription").textContent = data.descripcion || "No description available.";
+                document.getElementById("surveyDates").textContent =
+                    `${new Date(data.fechaInicio).toLocaleDateString()} - ${new Date(data.fechaFin).toLocaleDateString()}`;
 
-        const container = document.getElementById("questionsContainer");
-        container.innerHTML = "";
+                const container = document.getElementById("questionsContainer");
+                container.innerHTML = "";
 
-        data.preguntas.forEach(q => {
-            const card = document.createElement("div");
-            card.classList.add("question-card");
-            card.innerHTML = `
-                <div class="question-type">${q.tipo}</div>
-                <h3>${q.pregunta}</h3>
-            `;
-            container.appendChild(card);
-        });
+                data.preguntas.forEach(q => {
+                    const card = document.createElement("div");
+                    card.classList.add("question-card");
 
-    } catch (error) {
-        console.error("Error loading survey:", error);
-    }
-}
+                    let inputHTML = "";
+
+                    if (q.tipo === "ABIERTA") {
+                        inputHTML = `
+                            <textarea 
+                                id="resp_${q.idPregunta}" 
+                                rows="3" 
+                                style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+                            </textarea>
+                        `;
+                    }
+
+                    else if (q.tipo === "OPCION_MULTIPLE") {
+                        inputHTML = q.opciones?.length
+                            ? q.opciones.map(opt => `
+                                <label style="display:block; margin-bottom:5px;">
+                                    <input type="radio" name="resp_${q.idPregunta}" value="${opt.idOpcionPregunta}">
+                                    ${opt.texto}
+                                </label>
+                            `).join("")
+                            : `<p style="color:red;">⚠ Esta pregunta no tiene opciones configuradas.</p>`;
+                    }
+
+                    else if (q.tipo === "SI_NO") {
+                        inputHTML = `
+                            <label style="margin-right:10px;">
+                                <input type="radio" name="resp_${q.idPregunta}" value="SI"> Sí
+                            </label>
+                            <label>
+                                <input type="radio" name="resp_${q.idPregunta}" value="NO"> No
+                            </label>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        <div class="question-type">${q.tipo}</div>
+                        <h3>${q.pregunta}</h3>
+
+                        <div class="answer-box" style="margin-top:15px;">
+                            ${inputHTML}
+                        </div>
+                    `;
+
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error("Error loading survey:", error);
+            }
+        }
 
         loadSurveyDetails();
+
+
+        /* ============================================================
+           Enviar respuestas
+        ============================================================ */
+        async function enviarRespuestas() {
+            const respuestas = [];
+
+            document.querySelectorAll("[id^='resp_'], [name^='resp_']").forEach(input => {
+                let idPregunta;
+
+                if (input.id.startsWith("resp_")) {
+                    idPregunta = input.id.split("_")[1];
+                } else if (input.name.startsWith("resp_")) {
+                    idPregunta = input.name.split("_")[1];
+                }
+
+                let value = null;
+
+                if (input.tagName === "TEXTAREA") {
+                    value = input.value.trim();
+                    if (value)
+                        respuestas.push({ idPregunta: parseInt(idPregunta), respuestaTexto: value });
+                }
+
+                if (input.type === "radio" && input.checked) {
+                    respuestas.push({
+                        idPregunta: parseInt(idPregunta),
+                        respuestaTexto: input.value
+                    });
+                }
+            });
+
+            if (respuestas.length === 0) {
+                alert("Debes responder al menos una pregunta.");
+                return;
+            }
+
+            try {
+                const res = await fetch("http://localhost:3000/api/respuestas", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        idEncuesta: surveyId,
+                        respuestas
+                    })
+                });
+
+                const data = await res.json();
+                alert(data.message);
+
+            } catch (error) {
+                alert("Error al enviar las respuestas.");
+                console.error(error);
+            }
+        }
+
     </script>
 
 </body>

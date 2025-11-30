@@ -331,26 +331,37 @@ async function saveSurvey() {
     const preguntasHTML = document.querySelectorAll(".question-box");
     const preguntas = [];
 
-    preguntasHTML.forEach((box, index) => {
+preguntasHTML.forEach((box, index) => {
 
-        const tipoTexto = box.querySelector("strong").textContent.trim();
-        let tipo = "";
+    const tipoTexto = box.querySelector("strong").textContent.trim();
+    let tipo = "";
 
-        if (tipoTexto === "Short text") tipo = "ABIERTA";
-        else if (tipoTexto === "Long text") tipo = "ABIERTA";
-        else if (tipoTexto === "Multiple choice") tipo = "OPCION_MULTIPLE";
-        else if (tipoTexto === "Yes/No") tipo = "SI_NO";
-        else if (tipoTexto === "Rating (1–5)") tipo = "OPCION_MULTIPLE"; 
+    if (tipoTexto === "Short text") tipo = "ABIERTA";
+    else if (tipoTexto === "Long text") tipo = "ABIERTA";
+    else if (tipoTexto === "Multiple choice") tipo = "OPCION_MULTIPLE";
+    else if (tipoTexto === "Yes/No") tipo = "SI_NO";
+    else if (tipoTexto === "Rating (1–5)") tipo = "OPCION_MULTIPLE";
 
-        // OBTENER TEXTO DE LA PREGUNTA
-        const preguntaText = box.querySelector(".option-input").value.trim();
+    const preguntaText = box.querySelector(".option-input").value.trim();
 
-        preguntas.push({
-            texto: preguntaText,
-            tipo: tipo,
-            orden: index + 1
+    // SI ES OPCIÓN MÚLTIPLE, TOMAMOS LAS OPCIONES
+    let opciones = [];
+    if (tipo === "OPCION_MULTIPLE") {
+        const optionInputs = box.querySelectorAll(".option-block .option-input");
+        optionInputs.forEach(opt => {
+            const texto = opt.value.trim();
+            if (texto) opciones.push(texto);
         });
+    }
+
+    preguntas.push({
+        texto: preguntaText,
+        tipo: tipo,
+        orden: index + 1,
+        opciones: opciones 
     });
+});
+
 
     const data = {
         titulo,

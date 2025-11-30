@@ -1,19 +1,19 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { Pregunta } from "./Pregunta.js";
-import { OpcionRespuesta } from "./OpcionRespuesta.js";
-import { RespuestaEncuesta } from "./RespuestaEncuesta.js";
+import connection from "../config/database.js";
 
-export const RespuestaPregunta = sequelize.define("RespuestaPregunta", {
-  idRespPregunta: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  respuestaTexto: DataTypes.STRING
-});
+export const RespuestaPreguntaModel = {
+    guardarRespuestas: (idUsuario, respuestas, callback) => {
+        const sql = `
+            INSERT INTO respuesta_pregunta (respuestaTexto, idPregunta, idUsuario)
+            VALUES ?
+        `;
 
-RespuestaEncuesta.hasMany(RespuestaPregunta);
-RespuestaPregunta.belongsTo(RespuestaEncuesta);
+        const values = respuestas.map(r => [
+            r.respuestaTexto,
+            r.idPregunta,
+            idUsuario
+        ]);
 
-Pregunta.hasMany(RespuestaPregunta);
-RespuestaPregunta.belongsTo(Pregunta);
+        connection.query(sql, [values], callback);
+    }
+};
 
-OpcionRespuesta.hasMany(RespuestaPregunta);
-RespuestaPregunta.belongsTo(OpcionRespuesta);

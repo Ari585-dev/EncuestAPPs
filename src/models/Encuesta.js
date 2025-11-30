@@ -49,19 +49,25 @@ export const EncuestaModel = {
 getEncuestaConPreguntas: (idEncuesta, callback) => {
     const sql = `
         SELECT 
+            e.idEncuesta,
             e.titulo,
             e.descripcion,
             e.fechaInicio,
             e.fechaFin,
+            p.idPregunta,
             p.texto AS pregunta,
-            p.tipo
+            p.tipo,
+            o.idOpcionPregunta,
+            o.texto AS opcionTexto
         FROM encuesta e
         LEFT JOIN pregunta p ON p.idEncuesta = e.idEncuesta
+        LEFT JOIN opcionpregunta o ON o.idPregunta = p.idPregunta
         WHERE e.idEncuesta = ?;
     `;
 
     connection.query(sql, [idEncuesta], callback);
 }
+
 
 
 
