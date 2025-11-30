@@ -13,5 +13,6 @@ router.get("/empresa/:idEmpresa", EncuestaController.listarPorEmpresa);
 router.get("/:idEncuesta/resultados", EncuestaController.obtenerResultados);
 
 router.get("/surveys/:idEncuesta", EncuestaController.listaPorEncuesta);
+router.get("/encuesta/empresa/:idEmpresa", EncuestaController.contarEncuestas);
 
 export default router;

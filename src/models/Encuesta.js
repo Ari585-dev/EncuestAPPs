@@ -66,9 +66,16 @@ getEncuestaConPreguntas: (idEncuesta, callback) => {
     `;
 
     connection.query(sql, [idEncuesta], callback);
+},
+
+contarEncuestas: (idEmpresa, callback) => {
+  const sql = `
+    SELECT COUNT(*) AS total
+    FROM encuesta
+    WHERE idEmpresa = ?
+  `;
+
+  connection.query(sql, [idEmpresa], callback);
 }
-
-
-
 
 };

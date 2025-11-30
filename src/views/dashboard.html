@@ -172,12 +172,12 @@
         <!-- CARDS -->
         <div class="cards-container">
             <div class="card-small">
-                <h2>24</h2>
+                <h2 id="totalEncuestas">0</h2>
                 <p>Total Surveys</p>
             </div>
             <div class="card-small">
-                <h2>156</h2>
-                <p>Responses Today</p>
+                <h2 id="totalRespuestas">0</h2>
+                <p>Responses</p>
             </div>
             <div class="card-small">
                 <h2>3</h2>
@@ -217,7 +217,6 @@
     </div>
 
 <script>
-    // Load user info
     const user = JSON.parse(localStorage.getItem("userData"));
 
     if (!user) {
@@ -226,12 +225,38 @@
         document.getElementById("userName").textContent = user.nombre;
         document.getElementById("userRole").textContent = user.perfil;
     }
+    console.log(user.idEmpresa)
+    // 🔥 Aquí cargamos el total de respuestas de su empresa
+    async function cargarTotalRespuestas() {
+        try {
+            const res = await fetch(`http://localhost:3000/api/respuesta/empresa/${user.idEmpresa}`);
+            const data = await res.json();
 
+            document.getElementById("totalRespuestas").textContent = data.totalRespuestas ?? 0;
+        } catch (error) {
+            console.error("Error obteniendo total de respuestas:", error);
+        }
+    }
+
+        async function cargarTotalEncuestas() {
+        try {
+            const res = await fetch(`http://localhost:3000/api/encuesta/empresa/${user.idEmpresa}`);
+            const data = await res.json();
+
+            document.getElementById("totalEncuestas").textContent = data.totalEncuestas ?? 0;
+        } catch (error) {
+            console.error("Error obteniendo total de encuestas:", error);
+        }
+    }
+
+    cargarTotalRespuestas();
+    cargarTotalEncuestas();
     function logout() {
         localStorage.removeItem("userData");
         window.location.href = "http://localhost:3000/login";
     }
 </script>
+
 
 </body>
 </html>

@@ -14,5 +14,19 @@ export const RespuestaPreguntaModel = {
         ]);
 
         connection.query(sql, [values], callback);
-    }
+    },
+
+contarRespuestas: (idEmpresa, callback) => {
+  const sql = `
+    SELECT COUNT(*) AS total
+    FROM respuesta_pregunta rp
+    INNER JOIN pregunta p ON rp.idPregunta = p.idPregunta
+    INNER JOIN encuesta e ON p.idEncuesta = e.idEncuesta
+    WHERE e.idEmpresa = ?;
+  `;
+
+  connection.query(sql, [idEmpresa], callback);
+}
+
+
 };

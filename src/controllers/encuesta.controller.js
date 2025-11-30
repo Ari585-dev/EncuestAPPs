@@ -146,7 +146,24 @@ listaPorEncuesta: (req, res) => {
 
         res.json(encuesta);
     });
+},
+
+contarEncuestas: (req, res) => {
+    const { idEmpresa } = req.params;
+
+    if (!idEmpresa) {
+        return res.status(400).json({ error: "Falta idEmpresa" });
+    }
+
+    EncuestaModel.contarEncuestas(idEmpresa, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const total = result[0]?.total ?? 0;
+
+        res.json({ totalEncuestas: total });
+    });
 }
+
 
 
 
