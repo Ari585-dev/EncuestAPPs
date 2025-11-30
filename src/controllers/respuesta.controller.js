@@ -12,12 +12,11 @@ export const RespuestaController = {
             return res.status(400).json({ error: "Falta idUsuario" });
         }
 
-        RespuestaPreguntaModel.guardarRespuestas(idUsuario, respuestas, (err) => {
-            if (err) return res.status(500).json({ error: err.message });
+RespuestaPreguntaModel.guardarRespuestas(idUsuario, respuestas, (err) => {
+    if (err) return res.status(500).json({ error: err.message });
 
-            res.json({
-                message: "Respuestas guardadas correctamente",
-            });
-        });
+    res.json({ message: "Respuestas guardadas correctamente" });
+});
+
     }
 };

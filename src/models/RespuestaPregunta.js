@@ -16,4 +16,3 @@ export const RespuestaPreguntaModel = {
         connection.query(sql, [values], callback);
     }
 };
-

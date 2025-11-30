@@ -107,7 +107,6 @@ listaPorEncuesta: (req, res) => {
             return res.status(404).json({ error: "Encuesta no encontrada" });
         }
 
-          console.log("RAW DATA ===>", rows[0]);
 
         // Datos generales
         const encuesta = {

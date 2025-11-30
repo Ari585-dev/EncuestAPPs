@@ -218,7 +218,7 @@
                         inputHTML = q.opciones?.length
                             ? q.opciones.map(opt => `
                                 <label style="display:block; margin-bottom:5px;">
-                                    <input type="radio" name="resp_${q.idPregunta}" value="${opt.idOpcionPregunta}">
+                                    <input type="radio" name="resp_${q.idPregunta}" value="${opt.texto}">
                                     ${opt.texto}
                                 </label>
                             `).join("")
@@ -291,15 +291,20 @@
                 alert("Debes responder al menos una pregunta.");
                 return;
             }
-
+                                console.log({
+                    idEncuesta: surveyId,
+                    idUsuario: user.idUsuario,
+                    respuestas
+                });
             try {
                 const res = await fetch("http://localhost:3000/api/respuestas", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        idEncuesta: surveyId,
-                        respuestas
-                    })
+                body: JSON.stringify({
+                    idEncuesta: surveyId,
+                    idUsuario: user.idUsuario,   
+                    respuestas
+                })
                 });
 
                 const data = await res.json();
