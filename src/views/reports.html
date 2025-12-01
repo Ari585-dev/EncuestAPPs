@@ -6,6 +6,7 @@
     <title>EncuestAPPs - Reports</title>
 
     <style>
+        /* ... (Estilos CSS sin cambios) ... */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -123,7 +124,6 @@
 
 <body>
 
-    <!-- SIDEBAR -->
     <div class="sidebar">
         <h2>EncuestAPPs</h2>
 
@@ -134,10 +134,8 @@
         <div class="menu-item">Company Settings</div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="main">
 
-        <!-- TOP BAR -->
         <div class="top-bar">
             <div class="user-box">
                 <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" width="28">
@@ -150,23 +148,24 @@
 
         <h1>Reports</h1>
 
-        <!-- TABLE -->
+        <div style="text-align: center;"> 
+            <button class="btn-export btn-xlsx" onclick="exportXLSX()">Survey Report XSL</button>
+            <button class="btn-export btn-pdf" onclick="exportPDF()">Survey Report PDF</button>
+        </div>
+
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Survey Title</th>
-                    <th>Description</th>
                     <th>Start</th>
                     <th>End</th>
                     <th>Status</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
 
             <tbody id="surveyTableBody">
-                <!-- Loaded dynamically -->
-            </tbody>
+                </tbody>
         </table>
 
     </div>
@@ -174,7 +173,8 @@
 <script>
     // USER VALIDATION
     const user = JSON.parse(localStorage.getItem("userData"));
-    const idEmpresa = user.idEmpresa;
+    const idEmpresa = user ? user.idEmpresa : null; // Capturar idEmpresa de forma segura
+    
     if (!user) {
         window.location.href = "http://localhost:3000/login";
     }
@@ -190,8 +190,10 @@
     
     // GET SURVEYS FROM CORRECT BACKEND ROUTE
     async function cargarEncuestas() {
+        if (!idEmpresa) return; // Salir si no hay idEmpresa
+
         try {
-            const res = await fetch(`http://localhost:3000/api/empresa/${user.idEmpresa}`);
+            const res = await fetch(`http://localhost:3000/api/empresa/${idEmpresa}`);
             const encuestas = await res.json();
 
             const tbody = document.getElementById("surveyTableBody");
@@ -202,15 +204,9 @@
                     <tr>
                         <td>${enc.idEncuesta}</td>
                         <td>${enc.titulo}</td>
-                        <td>${enc.descripcion}</td>
                         <td>${enc.fechaInicio.split("T")[0]}</td>
                         <td>${enc.fechaFin.split("T")[0]}</td>
                         <td>${enc.estado}</td>
-
-                        <td>
-                            <button class="btn-export btn-xlsx" onclick="exportXLSX(${user.idEmpresa})">Export XLSX</button>
-                            <button class="btn-export btn-pdf" onclick="exportPDF(${user.idEmpresa})">PDF</button>
-                        </td>
                     </tr>
                 `;
             });
@@ -223,13 +219,22 @@
     cargarEncuestas();
 
     // EXPORT XLSX
-        function exportXLSX(idEmpresa) {
-            window.location.href = `http://localhost:3000/api/exportar/${idEmpresa}/excel`;
+    function exportXLSX() {
+        if (!idEmpresa) {
+            alert("No se pudo obtener el ID de la Empresa.");
+            return;
         }
+        window.location.href = `http://localhost:3000/api/exportar/${idEmpresa}/excel`;
+    }
 
-        function exportPDF(idEmpresa) {
-            window.location.href = `http://localhost:3000/api/exportar/${idEmpresa}/pdf`;
+    // EXPORT PDF
+    function exportPDF() {
+        if (!idEmpresa) {
+            alert("No se pudo obtener el ID de la Empresa.");
+            return;
         }
+        window.location.href = `http://localhost:3000/api/exportar/${idEmpresa}/pdf`;
+    }
 
 
     function logout() {

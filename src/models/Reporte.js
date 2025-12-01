@@ -16,14 +16,14 @@ SELECT
     p.tipo AS tipo_pregunta,
     p.orden AS orden_pregunta,
 
-    r.respuestaTexto AS respuesta
+    r.respuestaTexto AS respuesta,
+    r.idUsuario
 
 FROM encuesta e
 LEFT JOIN pregunta p ON p.idEncuesta = e.idEncuesta
 LEFT JOIN respuesta_pregunta r ON r.idPregunta = p.idPregunta
 WHERE e.idEmpresa = ?
-ORDER BY e.idEncuesta, p.orden;
-
+ORDER BY e.idEncuesta, p.orden, r.idUsuario;
 `;
 
         connection.query(sql, [idEmpresa], callback);
