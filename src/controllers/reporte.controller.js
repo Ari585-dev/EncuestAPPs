@@ -44,7 +44,7 @@ export const ReporteController = {
             const workbook = new ExcelJS.Workbook();
             const sheet = workbook.addWorksheet("EncuestasCompletas");
 
-            // Columnas (sin idUsuario)
+
             sheet.columns = [
                 { header: "Encuesta", key: "encuesta", width: 30 },
                 { header: "Descripción Encuesta", key: "encuesta_descripcion", width: 40 },
@@ -129,7 +129,6 @@ export const ReporteController = {
                 if (currentEncuestaId !== r.idEncuesta) {
                     if (currentEncuestaId !== null) doc.addPage();
                     
-                    // Fechas humanizadas aquí
                     const fechaInicioHumana = formatFecha(r.fechaInicio);
                     const fechaFinHumana = formatFecha(r.fechaFin);
                     
@@ -149,7 +148,6 @@ export const ReporteController = {
                     currentPreguntaId = r.idPregunta;
                 }
 
-                // **LÍNEA CORREGIDA:** Se eliminó `(Usuario ID: ${r.idUsuario || "N/A"})`
                 if (r.respuesta) doc.fontSize(12).text(`Respuesta: ${r.respuesta}`, { indent: 20 });
                 doc.moveDown(0.5);
             });

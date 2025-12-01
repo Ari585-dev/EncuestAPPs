@@ -171,7 +171,7 @@
     </div>
 
 <script>
-    // USER VALIDATION
+   
     const user = JSON.parse(localStorage.getItem("userData"));
     const idEmpresa = user ? user.idEmpresa : null; // Capturar idEmpresa de forma segura
     
@@ -179,7 +179,7 @@
         window.location.href = "http://localhost:3000/login";
     }
 
-    // Only allow SupAdmin & Analista
+
     if (user.perfil !== "SupAdmin" && user.perfil !== "Analista") {
         alert("Access denied.");
         window.location.href = "http://localhost:3000/dashboard";
@@ -188,9 +188,9 @@
     document.getElementById("userName").textContent = user.nombre;
     document.getElementById("userRole").textContent = user.perfil;
     
-    // GET SURVEYS FROM CORRECT BACKEND ROUTE
+ 
     async function cargarEncuestas() {
-        if (!idEmpresa) return; // Salir si no hay idEmpresa
+        if (!idEmpresa) return; 
 
         try {
             const res = await fetch(`http://localhost:3000/api/empresa/${idEmpresa}`);

@@ -132,7 +132,7 @@ listaPorEncuesta: (req, res) => {
                 };
             }
 
-            // CORREGIDO
+
             if (r.idOpcionPregunta) {
                 preguntasMap[r.idPregunta].opciones.push({
                     idOpcionPregunta: r.idOpcionPregunta,

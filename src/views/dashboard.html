@@ -193,7 +193,6 @@
         <div class="recent-card">
             <h3>Recent Surveys</h3>
 
-            <!-- 🔥 AQUÍ SE INSERTARÁN LAS ENCUESTAS DINÁMICAS -->
             <div id="surveyContainer"></div>
 
         </div>
@@ -210,7 +209,7 @@
         document.getElementById("userRole").textContent = user.perfil;
     }
 
-    // 🔥 TOTAL RESPUESTAS
+
     async function cargarTotalRespuestas() {
         try {
             const res = await fetch(`http://localhost:3000/api/respuesta/empresa/${user.idEmpresa}`);
@@ -233,7 +232,7 @@
         }
     }
 
-    // 🔥 TOTAL ENCUESTAS
+
     async function cargarTotalEncuestas() {
         try {
             const res = await fetch(`http://localhost:3000/api/encuesta/empresa/${user.idEmpresa}`);
@@ -245,7 +244,7 @@
         }
     }
 
-    // 🔥 CARGAR ENCUESTAS EN FORMATO EXACTO DEL DASHBOARD
+
     async function loadSurveys() {
         const container = document.getElementById("surveyContainer");
         container.innerHTML = ""; // limpiar
