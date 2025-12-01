@@ -35,6 +35,22 @@ contar: (req, res) => {
 
         res.json({ totalRespuestas: total });
     });
+},
+
+contarUsuarios: (req, res) => {
+    const { idEmpresa } = req.params;
+
+    if (!idEmpresa) {
+        return res.status(400).json({ error: "Falta idEmpresa" });
+    }
+
+    RespuestaPreguntaModel.contarUsuarios(idEmpresa, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const total = result[0]?.total ?? 0;
+
+        res.json({ totalRespuestas: total });
+    });
 }
 
 };

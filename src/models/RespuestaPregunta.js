@@ -26,6 +26,18 @@ contarRespuestas: (idEmpresa, callback) => {
   `;
 
   connection.query(sql, [idEmpresa], callback);
+},
+
+contarUsuarios: (idEmpresa, callback) => {
+  const sql = `
+  SELECT COUNT(DISTINCT rp.idUsuario) AS total
+  FROM respuesta_pregunta rp
+  JOIN pregunta p       ON rp.idPregunta = p.idPregunta
+  JOIN encuesta e       ON p.idEncuesta = e.idEncuesta
+  WHERE e.idEmpresa = ?;
+  `;
+
+  connection.query(sql, [idEmpresa], callback);
 }
 
 

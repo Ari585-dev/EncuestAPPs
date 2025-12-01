@@ -180,8 +180,8 @@
                 <p>Responses</p>
             </div>
             <div class="card-small">
-                <h2>3</h2>
-                <p>Pending to Close</p>
+                <h2 id="totalUsuariosRespuesta">0</h2>
+                <p>Total User Responses</p>
             </div>
             <div class="card-small">
                 <h2>87%</h2>
@@ -193,25 +193,9 @@
         <div class="recent-card">
             <h3>Recent Surveys</h3>
 
-            <div class="survey-row">
-                <span>Employee Satisfaction Q4 2024</span>
-                <span class="status active-status">Active</span>
-            </div>
+            <!-- 🔥 AQUÍ SE INSERTARÁN LAS ENCUESTAS DINÁMICAS -->
+            <div id="surveyContainer"></div>
 
-            <div class="survey-row">
-                <span>Product Feedback Survey</span>
-                <span class="status active-status">Active</span>
-            </div>
-
-            <div class="survey-row">
-                <span>Customer Experience Review</span>
-                <span class="status closed-status">Closed</span>
-            </div>
-
-            <div class="survey-row">
-                <span>Sustainability Practices</span>
-                <span class="status active-status">Active</span>
-            </div>
         </div>
 
     </div>
@@ -225,8 +209,8 @@
         document.getElementById("userName").textContent = user.nombre;
         document.getElementById("userRole").textContent = user.perfil;
     }
-    console.log(user.idEmpresa)
-    // 🔥 Aquí cargamos el total de respuestas de su empresa
+
+    // 🔥 TOTAL RESPUESTAS
     async function cargarTotalRespuestas() {
         try {
             const res = await fetch(`http://localhost:3000/api/respuesta/empresa/${user.idEmpresa}`);
@@ -238,7 +222,19 @@
         }
     }
 
-        async function cargarTotalEncuestas() {
+        async function cargarTotalUusariosRespuesta() {
+        try {
+            const res = await fetch(`http://localhost:3000/api/respuesta/usuario/${user.idEmpresa}`);
+            const data = await res.json();
+
+            document.getElementById("totalUsuariosRespuesta").textContent = data.totalRespuestas ?? 0;
+        } catch (error) {
+            console.error("Error obteniendo total de respuestas:", error);
+        }
+    }
+
+    // 🔥 TOTAL ENCUESTAS
+    async function cargarTotalEncuestas() {
         try {
             const res = await fetch(`http://localhost:3000/api/encuesta/empresa/${user.idEmpresa}`);
             const data = await res.json();
@@ -249,14 +245,53 @@
         }
     }
 
+    // 🔥 CARGAR ENCUESTAS EN FORMATO EXACTO DEL DASHBOARD
+    async function loadSurveys() {
+        const container = document.getElementById("surveyContainer");
+        container.innerHTML = ""; // limpiar
+
+        try {
+            const res = await fetch(`http://localhost:3000/api/empresa/${user.idEmpresa}`);
+            const surveys = await res.json();
+
+            surveys.forEach(s => {
+
+                let statusClass =
+                    s.estado === "Activa" ? "active-status" :
+                    s.estado === "Cerrada" ? "closed-status" :
+                    "draft-status";
+
+                const row = document.createElement("div");
+                row.classList.add("survey-row");
+                row.style.cursor = "pointer";
+
+                row.onclick = () => {
+                    window.location.href = `http://localhost:3000/surveys/${s.idEncuesta}`;
+                };
+
+                row.innerHTML = `
+                    <span>${s.titulo}</span>
+                    <span class="status ${statusClass}">${s.estado}</span>
+                `;
+
+                container.appendChild(row);
+            });
+
+        } catch (error) {
+            console.error("Error cargando encuestas:", error);
+        }
+    }
+
+    loadSurveys();
     cargarTotalRespuestas();
+    cargarTotalUusariosRespuesta();
     cargarTotalEncuestas();
+
     function logout() {
         localStorage.removeItem("userData");
         window.location.href = "http://localhost:3000/login";
     }
 </script>
-
 
 </body>
 </html>

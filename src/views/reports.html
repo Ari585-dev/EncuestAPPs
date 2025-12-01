@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EncuestAPPs - Dashboard</title>
+    <title>EncuestAPPs - Reports</title>
 
     <style>
         body {
@@ -40,7 +40,7 @@
             background: #0a4d25;
         }
 
-        /* MAIN CONTENT */
+        /* MAIN */
         .main {
             flex: 1;
             padding: 20px 40px;
@@ -78,57 +78,46 @@
             cursor: pointer;
         }
 
-        .newSurveyBtn {
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
             background: #0f6b33;
             color: white;
-            padding: 10px 18px;
-            border-radius: 20px;
+        }
+
+        .btn-export {
+            padding: 8px 12px;
+            border-radius: 6px;
             border: none;
             cursor: pointer;
-            float: right;
-            margin-bottom: 20px;
-            font-weight: bold;
+            font-size: 14px;
+            margin-right: 5px;
         }
 
-        /* CARDS */
-        .cards-container {
-            display: flex;
-            gap: 20px;
-        }
-
-        .card-small {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            flex: 1;
-            text-align: center;
-        }
-
-        /* RECENT SURVEYS */
-        .recent-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 20px;
-        }
-
-        .survey-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 5px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .status {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
+        .btn-pdf {
+            background: #d9534f;
             color: white;
         }
 
-        .active-status { background: #28a745; }
-        .closed-status { background: #6c757d; }
-        .draft-status { background: #ffc107; color: black; }
+        .btn-xlsx {
+            background: #0f6b33;
+            color: white;
+        }
+
     </style>
 </head>
 
@@ -138,20 +127,13 @@
     <div class="sidebar">
         <h2>EncuestAPPs</h2>
 
-        <div class="menu-item active" onclick="location.href='http://localhost:3000/dashboard'">
-            Dashboard
-        </div>
-
-        <div class="menu-item" onclick="location.href='http://localhost:3000/surveys'">
-            Surveys
-        </div>
-
-        <div class="menu-item" onclick="location.href='http://localhost:3000/reports'">
-            Reports
-        </div>
+        <div class="menu-item" onclick="location.href='http://localhost:3000/dashboard'">Dashboard</div>
+        <div class="menu-item" onclick="location.href='http://localhost:3000/surveys'">Surveys</div>
+        <div class="menu-item active" onclick="location.href='http://localhost:3000/reports'">Reports</div>
         <div class="menu-item">Users</div>
         <div class="menu-item">Company Settings</div>
     </div>
+
     <!-- MAIN CONTENT -->
     <div class="main">
 
@@ -166,21 +148,86 @@
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
 
-                <!-- CONTENT -->
         <h1>Reports</h1>
 
+        <!-- TABLE -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Survey Title</th>
+                    <th>Description</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="surveyTableBody">
+                <!-- Loaded dynamically -->
+            </tbody>
+        </table>
 
     </div>
 
 <script>
-    // Load user info
+    // USER VALIDATION
     const user = JSON.parse(localStorage.getItem("userData"));
 
     if (!user) {
         window.location.href = "http://localhost:3000/login";
-    } else {
-        document.getElementById("userName").textContent = user.nombre;
-        document.getElementById("userRole").textContent = user.perfil;
+    }
+
+    // Only allow SupAdmin & Analista
+    if (user.perfil !== "SupAdmin" && user.perfil !== "Analista") {
+        alert("Access denied.");
+        window.location.href = "http://localhost:3000/dashboard";
+    }
+
+    document.getElementById("userName").textContent = user.nombre;
+    document.getElementById("userRole").textContent = user.perfil;
+
+    // GET SURVEYS
+    async function cargarEncuestas() {
+        try {
+            const res = await fetch(`http://localhost:3000/api/empresa/${user.idEmpresa}`);
+            const encuestas = await res.json();
+
+            const tbody = document.getElementById("surveyTableBody");
+            tbody.innerHTML = "";
+
+            encuestas.forEach(enc => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${enc.idEncuesta}</td>
+                        <td>${enc.titulo}</td>
+                        <td>${enc.descripcion}</td>
+                        <td>${enc.fechaInicio.split("T")[0]}</td>
+                        <td>${enc.fechaFin.split("T")[0]}</td>
+                        <td>${enc.estado}</td>
+
+                        <td>
+                            <button class="btn-export btn-xlsx" onclick="exportXLSX(${enc.idEncuesta})">Export XLSX</button>
+                            <button class="btn-export btn-pdf" onclick="exportPDF(${enc.idEncuesta})">PDF</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+        } catch (err) {
+            console.error("Error loading surveys:", err);
+        }
+    }
+
+    cargarEncuestas();
+
+    function exportXLSX(idEncuesta) {
+        window.location.href = `http://localhost:3000/api/export/xlsx/${idEncuesta}`;
+    }
+
+    function exportPDF(idEncuesta) {
+        window.location.href = `http://localhost:3000/api/export/pdf/${idEncuesta}`;
     }
 
     function logout() {
