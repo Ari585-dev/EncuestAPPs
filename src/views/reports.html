@@ -174,7 +174,7 @@
 <script>
     // USER VALIDATION
     const user = JSON.parse(localStorage.getItem("userData"));
-
+    const idEmpresa = user.idEmpresa;
     if (!user) {
         window.location.href = "http://localhost:3000/login";
     }
@@ -187,8 +187,8 @@
 
     document.getElementById("userName").textContent = user.nombre;
     document.getElementById("userRole").textContent = user.perfil;
-
-    // GET SURVEYS
+    
+    // GET SURVEYS FROM CORRECT BACKEND ROUTE
     async function cargarEncuestas() {
         try {
             const res = await fetch(`http://localhost:3000/api/empresa/${user.idEmpresa}`);
@@ -208,8 +208,8 @@
                         <td>${enc.estado}</td>
 
                         <td>
-                            <button class="btn-export btn-xlsx" onclick="exportXLSX(${enc.idEncuesta})">Export XLSX</button>
-                            <button class="btn-export btn-pdf" onclick="exportPDF(${enc.idEncuesta})">PDF</button>
+                            <button class="btn-export btn-xlsx" onclick="exportXLSX(${user.idEmpresa})">Export XLSX</button>
+                            <button class="btn-export btn-pdf" onclick="exportPDF(${user.idEmpresa})">PDF</button>
                         </td>
                     </tr>
                 `;
@@ -222,13 +222,15 @@
 
     cargarEncuestas();
 
-    function exportXLSX(idEncuesta) {
-        window.location.href = `http://localhost:3000/api/export/xlsx/${idEncuesta}`;
-    }
+    // EXPORT XLSX
+        function exportXLSX(idEmpresa) {
+            window.location.href = `http://localhost:3000/api/exportar/${idEmpresa}/excel`;
+        }
 
-    function exportPDF(idEncuesta) {
-        window.location.href = `http://localhost:3000/api/export/pdf/${idEncuesta}`;
-    }
+        function exportPDF(idEmpresa) {
+            window.location.href = `http://localhost:3000/api/exportar/${idEmpresa}/pdf`;
+        }
+
 
     function logout() {
         localStorage.removeItem("userData");

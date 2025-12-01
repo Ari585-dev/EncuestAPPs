@@ -4,8 +4,11 @@ import empresaRoutes from "./src/routes/empresa.routes.js";
 import usuarioRoutes from "./src/routes/usuario.routes.js";
 import encuestaRoutes from "./src/routes/encuesta.routes.js";
 import respuestaRoutes from "./src/routes/respuesta.pregunta.routes.js";
+import reporteRoutes from "./src/routes/report.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +20,7 @@ app.use("/api", empresaRoutes);
 app.use("/api", usuarioRoutes);
 app.use("/api", encuestaRoutes);
 app.use("/api", respuestaRoutes);
+app.use("/api", reporteRoutes);
 // Servir el login
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "src/views/login.html"));
